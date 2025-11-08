@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MongoDB Test Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .success { background-color: #d4edda; }
+        .error { background-color: #f8d7da; }
+        button { padding: 10px 20px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>MongoDB Chatbot Test</h1>
+    <button onclick="testAgriculture()">Test Agriculture Query</button>
+    <button onclick="testHealth()">Test Health Query</button>
+    <button onclick="testEmployment()">Test Employment Query</button>
+    <button onclick="testAll()">Test All Sectors</button>
+    
+    <div id="results"></div>
+
+    <script>
+        async function testQuery(query, description) {
+            const resultsDiv = document.getElementById('results');
+            const testDiv = document.createElement('div');
+            testDiv.className = 'test-result';
+            testDiv.innerHTML = `<h3>${description}</h3><p>Testing: "${query}"</p>`;
+            resultsDiv.appendChild(testDiv);
+            
+            try {
+                const response = await fetch('/api/chat/text/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        language: 'en'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.schemes.length > 0) {
+                    testDiv.className = 'test-result success';
+                    testDiv.innerHTML += `
+                        <p><strong>✅ SUCCESS:</strong> Found ${data.schemes.length} schemes</p>
+                        <p><strong>Response:</strong> ${data.response.text.substring(0, 200)}...</p>
+                        <p><strong>Schemes:</strong></p>
+                        <ul>
+                            ${data.schemes.map(scheme => `<li>${scheme.title} (${scheme.sector})</li>`).join('')}
+                        </ul>
+                    `;
+                } else {
+                    testDiv.className = 'test-result error';
+                    testDiv.innerHTML += `
+                        <p><strong>❌ ERROR:</strong> No schemes found</p>
+                        <p><strong>Response:</strong> ${data.response.text}</p>
+                        <p><strong>Error:</strong> ${data.error || 'Unknown error'}</p>
+                    `;
+                }
+            } catch (error) {
+                testDiv.className = 'test-result error';
+                testDiv.innerHTML += `<p><strong>❌ CONNECTION ERROR:</strong> ${error.message}</p>`;
+            }
+        }
+        
+        function testAgriculture() {
+            testQuery('What are the agriculture schemes available?', 'Agriculture Schemes Test');
+        }
+        
+        function testHealth() {
+            testQuery('Tell me about health schemes', 'Health Schemes Test');
+        }
+        
+        function testEmployment() {
+            testQuery('What employment schemes are there?', 'Employment Schemes Test');
+        }
+        
+        function testAll() {
+            const queries = [
+                'What are the agriculture schemes available?',
+                'Tell me about health schemes',
+                'What employment schemes are there?',
+                'Show me education schemes',
+                'What social welfare schemes exist?',
+                'Tell me about urban development schemes'
+            ];
+            
+            queries.forEach((query, index) => {
+                setTimeout(() => {
+                    testQuery(query, `Test ${index + 1}: ${query}`);
+                }, index * 1000);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Chatbot Response</title>
+</head>
+<body>
+    <h1>Test Chatbot Response</h1>
+    <button onclick="testQuery()">Test Agriculture Query</button>
+    <div id="result"></div>
+
+    <script>
+        async function testQuery() {
+            try {
+                const response = await fetch('/api/chat/text/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: 'What are the agriculture schemes available?',
+                        language: 'en'
+                    })
+                });
+                
+                const data = await response.json();
+                document.getElementById('result').innerHTML = `
+                    <h3>Response:</h3>
+                    <p><strong>Success:</strong> ${data.success}</p>
+                    <p><strong>Response Text:</strong> ${data.response.text}</p>
+                    <p><strong>Schemes Found:</strong> ${data.schemes.length}</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                document.getElementById('result').innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+

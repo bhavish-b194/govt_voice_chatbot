@@ -1,0 +1,1903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>भारत सरकार वॉइस सहायक | Government Voice Assistant</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AI-powered voice assistant for Indian government schemes and services">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      /* Government of India Color Palette */
+      --primary-orange: #FF9933;
+      --primary-white: #FFFFFF;
+      --primary-green: #138808;
+      --navy-blue: #000080;
+      --dark-blue: #1e3a8a;
+      --light-blue: #3b82f6;
+      --success-green: #10b981;
+      --warning-orange: #f59e0b;
+      --error-red: #ef4444;
+      
+      /* Modern UI Colors */
+      --bg-primary: #f8fafc;
+      --bg-secondary: #ffffff;
+      --bg-accent: #f1f5f9;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --text-muted: #94a3b8;
+      --border-light: #e2e8f0;
+      --border-medium: #cbd5e1;
+      
+      /* Shadows */
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+      
+      /* Border Radius */
+      --radius-sm: 0.375rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+      --radius-xl: 1rem;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, var(--bg-primary) 0%, #e0f2fe 100%);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* Header Section */
+    .header {
+      background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-green) 100%);
+      color: white;
+      padding: 2rem 0;
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+      opacity: 0.3;
+    }
+
+    .header-content {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .header h1 {
+      font-family: 'Noto Sans Devanagari', 'Inter', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .header h2 {
+      font-size: 1.5rem;
+      font-weight: 400;
+      opacity: 0.95;
+      margin-bottom: 1rem;
+    }
+
+    .header-subtitle {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Chat Interface */
+    .chat-container {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl);
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+
+    .chat-header {
+      background: linear-gradient(135deg, var(--dark-blue) 0%, var(--light-blue) 100%);
+      color: white;
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .chat-header h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      opacity: 0.9;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success-green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* Chat Messages Area */
+    #log {
+      height: 500px;
+      overflow-y: auto;
+      padding: 1.5rem;
+      background: var(--bg-accent);
+      font-family: 'Inter', sans-serif;
+      scroll-behavior: smooth;
+    }
+
+    #log::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #log::-webkit-scrollbar-track {
+      background: var(--border-light);
+      border-radius: 3px;
+    }
+
+    #log::-webkit-scrollbar-thumb {
+      background: var(--border-medium);
+      border-radius: 3px;
+    }
+
+    #log::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted);
+    }
+
+    /* Message Styling */
+    #log p {
+      margin: 0.75rem 0;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-lg);
+      line-height: 1.5;
+      animation: fadeInUp 0.3s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .you {
+      background: linear-gradient(135deg, var(--light-blue) 0%, var(--dark-blue) 100%);
+      color: white;
+      margin-left: 2rem;
+      border-bottom-right-radius: 0.25rem;
+      box-shadow: var(--shadow-md);
+    }
+
+    .bot {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      margin-right: 2rem;
+      border: 1px solid var(--border-light);
+      border-bottom-left-radius: 0.25rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Scheme Cards */
+    .schemes-container {
+      margin: 1rem 0;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border-radius: var(--radius-lg);
+      border-left: 4px solid var(--primary-green);
+      box-shadow: var(--shadow-md);
+    }
+
+    .schemes-container h3 {
+      color: var(--primary-green);
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .scheme-card {
+      background: white;
+      margin: 1rem 0;
+      padding: 1.5rem;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      border-left: 4px solid var(--primary-orange);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scheme-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary-orange) 0%, var(--primary-green) 100%);
+    }
+
+    .scheme-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .scheme-card h4 {
+      color: var(--text-primary);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .scheme-card p {
+      margin: 0.5rem 0;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .scheme-card strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .scheme-card a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--light-blue);
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      background: #eff6ff;
+      border-radius: var(--radius-md);
+      transition: all 0.2s ease;
+      margin-top: 0.5rem;
+    }
+
+    .scheme-card a:hover {
+      background: var(--light-blue);
+      color: white;
+      transform: translateX(2px);
+    }
+
+    /* Input Controls */
+    .input-container {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .voice-section {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .voice-btn {
+      background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-green) 100%);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: var(--radius-xl);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .voice-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .voice-btn:hover::before {
+      left: 100%;
+    }
+
+    .voice-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-xl);
+    }
+
+    .voice-btn:active {
+      transform: translateY(0);
+    }
+
+    .voice-btn i {
+      font-size: 1.25rem;
+    }
+
+    /* Text Input Area */
+    .text-input-section {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .text-input {
+      flex: 1;
+      padding: 1rem 1.5rem;
+      border: 2px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-accent);
+      color: var(--text-primary);
+      transition: all 0.3s ease;
+    }
+
+    .text-input:focus {
+      outline: none;
+      border-color: var(--light-blue);
+      background: white;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .text-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .send-btn {
+      background: var(--light-blue);
+      color: white;
+      border: none;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius-lg);
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-md);
+    }
+
+    .send-btn:hover {
+      background: var(--dark-blue);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .send-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Language Selector */
+    .language-section {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .language-label {
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .language-select {
+      padding: 0.75rem 1rem;
+      border: 2px solid var(--border-light);
+      border-radius: var(--radius-md);
+      background: white;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      min-width: 150px;
+    }
+
+    .language-select:focus {
+      outline: none;
+      border-color: var(--light-blue);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    /* Sample Questions */
+    .sample-questions {
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+
+    .sample-questions h4 {
+      color: var(--text-primary);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .question-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+    }
+
+    .question-btn {
+      background: white;
+      border: 2px solid var(--primary-green);
+      color: var(--primary-green);
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-lg);
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+
+    .question-btn:hover {
+      background: var(--primary-green);
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Utility Buttons */
+    .utility-section {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .utility-btn {
+      background: var(--light-blue);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .utility-btn:hover {
+      background: var(--dark-blue);
+      transform: translateY(-1px);
+    }
+
+    /* Advanced Search Styles */
+    .advanced-search-container {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 2px solid var(--border-light);
+    }
+
+    .search-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--border-light);
+    }
+
+    .search-header h3 {
+      color: var(--text-primary);
+      font-size: 1.25rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0;
+    }
+
+    .toggle-search-btn {
+      background: var(--light-blue);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .toggle-search-btn:hover {
+      background: var(--dark-blue);
+      transform: translateY(-1px);
+    }
+
+    .search-filters {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .filter-label {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .filter-select, .filter-input {
+      padding: 0.75rem 1rem;
+      border: 2px solid var(--border-light);
+      border-radius: var(--radius-md);
+      background: white;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .filter-select:focus, .filter-input:focus {
+      outline: none;
+      border-color: var(--light-blue);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .search-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .search-btn {
+      background: linear-gradient(135deg, var(--primary-green) 0%, var(--light-blue) 100%);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius-lg);
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-md);
+    }
+
+    .search-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .clear-btn {
+      background: var(--warning-orange);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius-lg);
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .clear-btn:hover {
+      background: #d97706;
+      transform: translateY(-1px);
+    }
+
+    .search-results-header {
+      background: var(--bg-accent);
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius-lg);
+      margin: 1rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .results-count {
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .sort-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .sort-label {
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .sort-select {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      background: white;
+      font-size: 0.875rem;
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: var(--text-muted);
+      background: var(--bg-accent);
+      border-radius: var(--radius-lg);
+      margin: 2rem 0;
+    }
+
+    .no-results i {
+      font-size: 3rem;
+      color: var(--warning-orange);
+      margin-bottom: 1rem;
+    }
+
+    .no-results h3 {
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .search-suggestions {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .suggestion-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .suggestion-chip {
+      background: var(--light-blue);
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-lg);
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .suggestion-chip:hover {
+      background: var(--dark-blue);
+      transform: translateY(-1px);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+      
+      .header h1 {
+        font-size: 2rem;
+      }
+      
+      .header h2 {
+        font-size: 1.25rem;
+      }
+      
+      .input-group {
+        flex-direction: column;
+      }
+      
+      .text-input {
+        width: 100%;
+      }
+      
+      .language-section {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .question-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .question-btn {
+        width: 100%;
+        max-width: 300px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header {
+        padding: 1.5rem 0;
+      }
+      
+      .header h1 {
+        font-size: 1.75rem;
+      }
+      
+      .header h2 {
+        font-size: 1.1rem;
+      }
+      
+      .chat-header {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+      }
+      
+      #log {
+        height: 400px;
+        padding: 1rem;
+      }
+      
+      .you, .bot {
+        margin-left: 0;
+        margin-right: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Modern Header -->
+  <header class="header">
+    <div class="header-content">
+      <h1>भारत सरकार वॉइस सहायक</h1>
+      <h2>Government Voice Assistant</h2>
+      <p class="header-subtitle">
+        <i class="fas fa-robot"></i>
+        AI-powered assistant for Indian government schemes and services
+      </p>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="container">
+    <!-- Chat Interface -->
+    <div class="chat-container">
+      <div class="chat-header">
+        <h3>
+          <i class="fas fa-comments"></i>
+          Chat Assistant
+        </h3>
+        <div class="status-indicator">
+          <div class="status-dot"></div>
+          <span id="connection-status">Online</span>
+        </div>
+      </div>
+      <div id="log"></div>
+    </div>
+
+    <!-- Input Controls -->
+    <div class="input-container">
+      <!-- Voice Button -->
+      <div class="voice-section">
+        <button class="voice-btn" onclick="talk()">
+          <i class="fas fa-microphone"></i>
+          <span>CLICK & SPEAK</span>
+        </button>
+      </div>
+      
+      <!-- Advanced Search Container -->
+      <div id="advanced-search-container" class="advanced-search-container" style="display: none;">
+        <div class="search-header">
+          <h3>
+            <i class="fas fa-search-plus"></i>
+            <span id="advanced-search-title">Advanced Search</span>
+          </h3>
+          <button onclick="toggleAdvancedSearch()" class="toggle-search-btn">
+            <i class="fas fa-times"></i>
+            <span id="close-search-text">Close</span>
+          </button>
+        </div>
+        
+        <div class="search-filters">
+          <div class="filter-group">
+            <label class="filter-label">
+              <i class="fas fa-layer-group"></i>
+              <span id="sector-filter-label">Sector</span>
+            </label>
+            <select id="sectorFilter" class="filter-select">
+              <option value="">All Sectors</option>
+              <option value="agriculture">🌾 Agriculture</option>
+              <option value="health">🏥 Health</option>
+              <option value="education">🎓 Education</option>
+              <option value="employment">💼 Employment</option>
+              <option value="housing">🏠 Housing</option>
+              <option value="social_welfare">🤝 Social Welfare</option>
+              <option value="rural_development">🏘️ Rural Development</option>
+              <option value="urban_development">🏙️ Urban Development</option>
+              <option value="women_empowerment">👩 Women Empowerment</option>
+              <option value="youth_development">👨‍🎓 Youth Development</option>
+              <option value="senior_citizens">👴 Senior Citizens</option>
+              <option value="disability">♿ Disability</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label class="filter-label">
+              <i class="fas fa-building"></i>
+              <span id="ministry-filter-label">Ministry</span>
+            </label>
+            <input type="text" id="ministryFilter" class="filter-input" placeholder="Enter ministry name...">
+          </div>
+          
+          <div class="filter-group">
+            <label class="filter-label">
+              <i class="fas fa-user-check"></i>
+              <span id="eligibility-filter-label">Eligibility Keywords</span>
+            </label>
+            <input type="text" id="eligibilityFilter" class="filter-input" placeholder="e.g., farmer, woman, student...">
+          </div>
+          
+          <div class="filter-group">
+            <label class="filter-label">
+              <i class="fas fa-sort"></i>
+              <span id="sort-by-label">Sort By</span>
+            </label>
+            <select id="sortBy" class="filter-select">
+              <option value="relevance">Relevance</option>
+              <option value="alphabetical">Alphabetical</option>
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="search-actions">
+          <button onclick="performAdvancedSearch()" class="search-btn">
+            <i class="fas fa-search"></i>
+            <span id="search-btn-text">Search Schemes</span>
+          </button>
+          <button onclick="clearAdvancedFilters()" class="clear-btn">
+            <i class="fas fa-eraser"></i>
+            <span id="clear-filters-text">Clear Filters</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Text Input will be added by JavaScript -->
+      <div id="text-input-area"></div>
+    </div>
+  </div>
+
+  <script>
+  let currentLanguage = 'en';
+  let currentUILanguage = 'en';
+
+  // UI Language translations
+  const uiTranslations = {
+    en: {
+      title: "भारत सरकार वॉइस सहायक",
+      subtitle: "Government Voice Assistant", 
+      description: "AI-powered assistant for Indian government schemes and services",
+      chatAssistant: "Chat Assistant",
+      online: "Online",
+      offline: "Offline",
+      clickSpeak: "CLICK & SPEAK",
+      send: "Send",
+      language: "Language",
+      placeholder: "Type your question about government schemes...",
+      sampleQuestions: "Try these sample questions:",
+      agriculture: "Agriculture Schemes",
+      health: "Health Schemes", 
+      education: "Education Schemes",
+      employment: "Employment Schemes",
+      housing: "Housing Schemes",
+      testMic: "Test Microphone",
+      clearChat: "Clear Chat",
+      help: "Help",
+      welcome: "Welcome to Government Voice Assistant!",
+      welcomeDesc: "Ask about government schemes, eligibility, benefits, and application processes",
+      relatedSchemes: "Related Government Schemes",
+      sector: "Sector",
+      description: "Description",
+      ministry: "Ministry",
+      eligibility: "Eligibility",
+      benefits: "Benefits",
+      applyOnline: "Apply Online",
+      processing: "Processing...",
+      chatCleared: "Chat cleared! Ready for new questions.",
+      helpTitle: "How to use this assistant:",
+      helpVoice: "Voice Input: Click \"CLICK & SPEAK\" and ask your question",
+      helpText: "Text Input: Type your question in the text box",
+      helpSample: "Sample Questions: Click any sample question button",
+      helpLanguages: "Languages: Switch between 9 Indian languages",
+      helpTopics: "Topics: Ask about eligibility, benefits, application process",
+      // Enhanced search translations
+      advancedSearch: "Advanced Search",
+      filters: "Filters",
+      sortBy: "Sort By",
+      allSectors: "All Sectors",
+      agriculture: "Agriculture",
+      health: "Health",
+      education: "Education", 
+      employment: "Employment",
+      housing: "Housing",
+      socialWelfare: "Social Welfare",
+      ruralDevelopment: "Rural Development",
+      urbanDevelopment: "Urban Development",
+      womenEmpowerment: "Women Empowerment",
+      youthDevelopment: "Youth Development",
+      seniorCitizens: "Senior Citizens",
+      disability: "Disability",
+      sortRelevance: "Relevance",
+      sortAlphabetical: "Alphabetical",
+      sortNewest: "Newest First",
+      sortOldest: "Oldest First",
+      filterByMinistry: "Filter by Ministry",
+      filterByEligibility: "Filter by Eligibility",
+      showResults: "Show Results",
+      clearFilters: "Clear Filters",
+      resultsFound: "results found",
+      noResults: "No schemes found matching your criteria"
+    },
+    kn: {
+      title: "ಭಾರತ ಸರ್ಕಾರದ ಧ್ವನಿ ಸಹಾಯಕ",
+      subtitle: "ಸರ್ಕಾರಿ ಧ್ವನಿ ಸಹಾಯಕ",
+      description: "ಭಾರತೀಯ ಸರ್ಕಾರಿ ಯೋಜನೆಗಳು ಮತ್ತು ಸೇವೆಗಳಿಗಾಗಿ AI-ಚಾಲಿತ ಸಹಾಯಕ",
+      chatAssistant: "ಚಾಟ್ ಸಹಾಯಕ",
+      online: "ಆನ್‌ಲೈನ್",
+      offline: "ಆಫ್‌ಲೈನ್",
+      clickSpeak: "ಕ್ಲಿಕ್ ಮಾಡಿ ಮತ್ತು ಮಾತನಾಡಿ",
+      send: "ಕಳುಹಿಸಿ",
+      language: "ಭಾಷೆ",
+      placeholder: "ಸರ್ಕಾರಿ ಯೋಜನೆಗಳ ಬಗ್ಗೆ ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಟೈಪ್ ಮಾಡಿ...",
+      sampleQuestions: "ಈ ಮಾದರಿ ಪ್ರಶ್ನೆಗಳನ್ನು ಪ್ರಯತ್ನಿಸಿ:",
+      agriculture: "ಕೃಷಿ ಯೋಜನೆಗಳು",
+      health: "ಆರೋಗ್ಯ ಯೋಜನೆಗಳು",
+      education: "ಶಿಕ್ಷಣ ಯೋಜನೆಗಳು",
+      employment: "ಉದ್ಯೋಗ ಯೋಜನೆಗಳು",
+      housing: "ವಸತಿ ಯೋಜನೆಗಳು",
+      testMic: "ಮೈಕ್ರೊಫೋನ್ ಪರೀಕ್ಷಿಸಿ",
+      clearChat: "ಚಾಟ್ ತೆರವುಗೊಳಿಸಿ",
+      help: "ಸಹಾಯ",
+      welcome: "ಸರ್ಕಾರಿ ಧ್ವನಿ ಸಹಾಯಕಕ್ಕೆ ಸ್ವಾಗತ!",
+      welcomeDesc: "ಸರ್ಕಾರಿ ಯೋಜನೆಗಳು, ಅರ್ಹತೆ, ಪ್ರಯೋಜನಗಳು ಮತ್ತು ಅರ್ಜಿ ಪ್ರಕ್ರಿಯೆಗಳ ಬಗ್ಗೆ ಕೇಳಿ",
+      relatedSchemes: "ಸಂಬಂಧಿತ ಸರ್ಕಾರಿ ಯೋಜನೆಗಳು",
+      sector: "ವಲಯ",
+      description: "ವಿವರಣೆ",
+      ministry: "ಸಚಿವಾಲಯ",
+      eligibility: "ಅರ್ಹತೆ",
+      benefits: "ಪ್ರಯೋಜನಗಳು",
+      applyOnline: "ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಅರ್ಜಿ ಸಲ್ಲಿಸಿ",
+      processing: "ಪ್ರಕ್ರಿಯೆಗೊಳಿಸಲಾಗುತ್ತಿದೆ...",
+      chatCleared: "ಚಾಟ್ ತೆರವುಗೊಳಿಸಲಾಗಿದೆ! ಹೊಸ ಪ್ರಶ್ನೆಗಳಿಗೆ ಸಿದ್ಧ.",
+      helpTitle: "ಈ ಸಹಾಯಕವನ್ನು ಹೇಗೆ ಬಳಸುವುದು:",
+      helpVoice: "ಧ್ವನಿ ಇನ್‌ಪುಟ್: \"ಕ್ಲಿಕ್ ಮಾಡಿ ಮತ್ತು ಮಾತನಾಡಿ\" ಕ್ಲಿಕ್ ಮಾಡಿ ಮತ್ತು ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಕೇಳಿ",
+      helpText: "ಪಠ್ಯ ಇನ್‌ಪುಟ್: ಪಠ್ಯ ಬಾಕ್ಸ್‌ನಲ್ಲಿ ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಟೈಪ್ ಮಾಡಿ",
+      helpSample: "ಮಾದರಿ ಪ್ರಶ್ನೆಗಳು: ಯಾವುದೇ ಮಾದರಿ ಪ್ರಶ್ನೆ ಬಟನ್ ಕ್ಲಿಕ್ ಮಾಡಿ",
+      helpLanguages: "ಭಾಷೆಗಳು: 9 ಭಾರತೀಯ ಭಾಷೆಗಳ ನಡುವೆ ಬದಲಾಯಿಸಿ",
+      helpTopics: "ವಿಷಯಗಳು: ಅರ್ಹತೆ, ಪ್ರಯೋಜನಗಳು, ಅರ್ಜಿ ಪ್ರಕ್ರಿಯೆಯ ಬಗ್ಗೆ ಕೇಳಿ",
+      // Enhanced search translations in Kannada
+      advancedSearch: "ಸುಧಾರಿತ ಹುಡುಕಾಟ",
+      filters: "ಫಿಲ್ಟರ್‌ಗಳು",
+      sortBy: "ಇದರ ಪ್ರಕಾರ ವಿಂಗಡಿಸಿ",
+      allSectors: "ಎಲ್ಲಾ ವಲಯಗಳು",
+      agriculture: "ಕೃಷಿ",
+      health: "ಆರೋಗ್ಯ",
+      education: "ಶಿಕ್ಷಣ",
+      employment: "ಉದ್ಯೋಗ",
+      housing: "ವಸತಿ",
+      socialWelfare: "ಸಾಮಾಜಿಕ ಕಲ್ಯಾಣ",
+      ruralDevelopment: "ಗ್ರಾಮೀಣ ಅಭಿವೃದ್ಧಿ",
+      urbanDevelopment: "ನಗರ ಅಭಿವೃದ್ಧಿ",
+      womenEmpowerment: "ಮಹಿಳಾ ಸಬಲೀಕರಣ",
+      youthDevelopment: "ಯುವ ಅಭಿವೃದ್ಧಿ",
+      seniorCitizens: "ಹಿರಿಯ ನಾಗರಿಕರು",
+      disability: "ವಿಕಲಾಂಗತೆ",
+      sortRelevance: "ಸಂಬಂಧ",
+      sortAlphabetical: "ವರ್ಣಮಾಲೆಯ ಕ್ರಮ",
+      sortNewest: "ಹೊಸದು ಮೊದಲು",
+      sortOldest: "ಹಳೆಯದು ಮೊದಲು",
+      filterByMinistry: "ಸಚಿವಾಲಯದ ಪ್ರಕಾರ ಫಿಲ್ಟರ್ ಮಾಡಿ",
+      filterByEligibility: "ಅರ್ಹತೆಯ ಪ್ರಕಾರ ಫಿಲ್ಟರ್ ಮಾಡಿ",
+      showResults: "ಫಲಿತಾಂಶಗಳನ್ನು ತೋರಿಸಿ",
+      clearFilters: "ಫಿಲ್ಟರ್‌ಗಳನ್ನು ತೆರವುಗೊಳಿಸಿ",
+      resultsFound: "ಫಲಿತಾಂಶಗಳು ಸಿಕ್ಕಿವೆ",
+      noResults: "ನಿಮ್ಮ ಮಾನದಂಡಗಳಿಗೆ ಹೊಂದಿಕೆಯಾಗುವ ಯೋಜನೆಗಳು ಸಿಗಲಿಲ್ಲ"
+    }
+  };
+
+  function log(msg, cls = '') {
+      const p = document.createElement('p');
+      p.innerHTML = msg;
+      if (cls) p.className = cls;
+      document.getElementById('log').appendChild(p);
+      // Auto-scroll to bottom
+      document.getElementById('log').scrollTop = document.getElementById('log').scrollHeight;
+  }
+
+  function displaySchemes(schemes) {
+      if (schemes && schemes.length > 0) {
+          const t = uiTranslations[currentUILanguage];
+          let schemesHtml = `
+              <div class="schemes-container">
+                  <h3>
+                      <i class="fas fa-file-alt"></i>
+                      ${t.relatedSchemes} (${schemes.length})
+                  </h3>
+          `;
+          
+          schemes.forEach((scheme, index) => {
+              // Get sector icon
+              const sectorIcon = getSectorIcon(scheme.sector);
+              
+              schemesHtml += `
+                  <div class="scheme-card">
+                      <h4>
+                          ${sectorIcon}
+                          ${scheme.title}
+                      </h4>
+                      <p><strong><i class="fas fa-tag"></i> ${t.sector}:</strong> ${scheme.sector.charAt(0).toUpperCase() + scheme.sector.slice(1).replace('_', ' ')}</p>
+                      <p><strong><i class="fas fa-info-circle"></i> ${t.description}:</strong> ${scheme.short_description}</p>
+                      ${scheme.ministry ? `<p><strong><i class="fas fa-building"></i> ${t.ministry}:</strong> ${scheme.ministry}</p>` : ''}
+                      ${scheme.eligibility_criteria ? `<p><strong><i class="fas fa-user-check"></i> ${t.eligibility}:</strong> ${scheme.eligibility_criteria.substring(0, 200)}...</p>` : ''}
+                      ${scheme.benefits ? `<p><strong><i class="fas fa-gift"></i> ${t.benefits}:</strong> ${scheme.benefits.substring(0, 150)}...</p>` : ''}
+                      ${scheme.application_link ? `
+                          <a href="${scheme.application_link}" target="_blank">
+                              <i class="fas fa-external-link-alt"></i>
+                              ${t.applyOnline}
+                          </a>
+                      ` : ''}
+                  </div>
+              `;
+          });
+          
+          schemesHtml += '</div>';
+          log(schemesHtml, 'schemes');
+      }
+  }
+
+  function getSectorIcon(sector) {
+      const icons = {
+          'agriculture': '🌾',
+          'health': '🏥',
+          'education': '🎓',
+          'employment': '💼',
+          'housing': '🏠',
+          'social_welfare': '🤝',
+          'rural_development': '🏘️',
+          'urban_development': '🏙️',
+          'women_empowerment': '👩',
+          'youth_development': '👨‍🎓',
+          'senior_citizens': '👴',
+          'disability': '♿'
+      };
+      return icons[sector] || '📋';
+  }
+
+  async function sendTextQuery(query) {
+      if (!query.trim()) return;
+      
+      const t = uiTranslations[currentUILanguage];
+      log(`<span class="you">You:</span> ${query}`, 'you');
+      log(t.processing, 'bot');
+      
+      try {
+          const response = await fetch('/api/chat/text/', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRFToken': getCookie('csrftoken')
+              },
+              body: JSON.stringify({
+                  query: query,
+                  language: currentLanguage
+              })
+          });
+          
+          const data = await response.json();
+          
+          if (data.success) {
+              log(`<span class="bot">Bot:</span> ${data.response}`, 'bot');
+              displaySchemes(data.schemes);
+              
+              if (data.confidence < 0.5) {
+                  log('<em>Note: I\'m not very confident about this answer. Please try rephrasing your question.</em>', 'bot');
+              }
+          } else {
+              log(`<span class="bot">Error:</span> ${data.error || 'Failed to process your query'}`, 'bot');
+          }
+      } catch (error) {
+          log(`<span class="bot">Error:</span> Network error. Please try again.`, 'bot');
+          console.error('Text query error:', error);
+      }
+  }
+
+  async function talk() {
+      // Check internet connectivity first
+      if (!navigator.onLine) {
+          log('<span class="bot">🌐 No internet connection detected.</span>', 'bot');
+          log('<span class="bot">Switching to offline voice processing...</span>', 'bot');
+          useOfflineVoiceRecording();
+          return;
+      }
+      
+      // Check if Web Speech API is available (online method)
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+          useWebSpeechAPI();
+      } else {
+          log('<span class="bot">Voice input not supported in this browser.</span>', 'bot');
+          log('<span class="bot">Trying offline voice processing...</span>', 'bot');
+          useOfflineVoiceRecording();
+      }
+  }
+
+  function useWebSpeechAPI() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      
+      // Improved settings for better recognition
+      recognition.continuous = false;
+      recognition.interimResults = true;  // Show interim results
+      recognition.maxAlternatives = 1;
+      recognition.lang = getLanguageCode(currentLanguage);
+      
+      log('🎤 Listening... Speak now!', 'bot');
+      log('<em>💡 Tip: Speak clearly and ensure your microphone is working</em>', 'bot');
+      
+      let finalTranscript = '';
+      let interimTranscript = '';
+      
+      recognition.onstart = function() {
+          console.log('Speech recognition started');
+          log('🔴 Recording started - speak now!', 'bot');
+      };
+      
+      recognition.onresult = function(event) {
+          interimTranscript = '';
+          finalTranscript = '';
+          
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+              const transcript = event.results[i][0].transcript;
+              if (event.results[i].isFinal) {
+                  finalTranscript += transcript;
+              } else {
+                  interimTranscript += transcript;
+              }
+          }
+          
+          // Show interim results to user
+          if (interimTranscript) {
+              log(`<span class="you">Hearing:</span> <em>${interimTranscript}</em>`, 'you');
+          }
+          
+          // Process final result
+          if (finalTranscript) {
+              const confidence = event.results[event.results.length - 1][0].confidence;
+              log(`<span class="you">You said:</span> ${finalTranscript}`, 'you');
+              log(`<em>Confidence: ${Math.round(confidence * 100)}%</em>`, 'bot');
+              
+              // Send the recognized text to chat API
+              sendTextQuery(finalTranscript);
+          }
+      };
+      
+      recognition.onerror = function(event) {
+          console.log('Speech recognition error:', event.error);
+          
+          if (event.error === 'no-speech') {
+              log('<span class="bot">❌ No speech detected.</span>', 'bot');
+              log('<span class="bot">🔧 Troubleshooting:</span>', 'bot');
+              log('• Check if your microphone is connected and working', 'bot');
+              log('• Try speaking louder and clearer', 'bot');
+              log('• Make sure you allowed microphone permissions', 'bot');
+              log('• Try refreshing the page and allowing microphone access again', 'bot');
+          } else if (event.error === 'not-allowed') {
+              log('<span class="bot">❌ Microphone access denied.</span>', 'bot');
+              log('<span class="bot">🔧 To fix this:</span>', 'bot');
+              log('• Click the microphone icon in your browser address bar', 'bot');
+              log('• Select "Always allow" for microphone access', 'bot');
+              log('• Refresh the page and try again', 'bot');
+          } else if (event.error === 'network') {
+              log('<span class="bot">❌ Network error.</span> Please check your internet connection.', 'bot');
+          } else if (event.error === 'audio-capture') {
+              log('<span class="bot">❌ Audio capture error.</span>', 'bot');
+              log('• Check if another application is using your microphone', 'bot');
+              log('• Try closing other applications and refresh the page', 'bot');
+          } else {
+              log(`<span class="bot">❌ Speech Recognition Error:</span> ${event.error}`, 'bot');
+              log('<span class="bot">💡 Alternative:</span> Use the text input below instead.', 'bot');
+          }
+      };
+      
+      recognition.onend = function() {
+          log('🎤 Listening stopped', 'bot');
+          if (!finalTranscript && !interimTranscript) {
+              log('<span class="bot">💡 Try again:</span> Click "CLICK & SPEAK" and speak immediately after you see "Recording started"', 'bot');
+          }
+      };
+      
+      try {
+          recognition.start();
+      } catch (error) {
+          log(`<span class="bot">❌ Failed to start speech recognition:</span> ${error.message}`, 'bot');
+          log('<span class="bot">💡 Please use the text input below instead.</span>', 'bot');
+      }
+  }
+
+  // Offline voice recording function (uses server-side Whisper)
+  async function useOfflineVoiceRecording() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          log('<span class="bot">❌ Microphone access not available.</span>', 'bot');
+          log('<span class="bot">Please use text input instead.</span>', 'bot');
+          return;
+      }
+
+      try {
+          log('🎤 Starting offline voice recording...', 'bot');
+          log('<em>💡 This works without internet using server-side processing</em>', 'bot');
+          
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          const mediaRecorder = new MediaRecorder(stream);
+          const audioChunks = [];
+          
+          mediaRecorder.ondataavailable = event => {
+              audioChunks.push(event.data);
+          };
+          
+          mediaRecorder.onstop = async () => {
+              log('🔄 Processing audio offline...', 'bot');
+              const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+              await sendOfflineVoiceQuery(audioBlob);
+              stream.getTracks().forEach(track => track.stop());
+          };
+          
+          log('🔴 Recording... Speak now! (Will auto-stop in 10 seconds)', 'bot');
+          mediaRecorder.start();
+          
+          // Auto-stop after 10 seconds
+          setTimeout(() => {
+              if (mediaRecorder.state === 'recording') {
+                  mediaRecorder.stop();
+                  log('⏹️ Recording stopped', 'bot');
+              }
+          }, 10000);
+          
+      } catch (error) {
+          log(`<span class="bot">❌ Could not access microphone:</span> ${error.message}`, 'bot');
+          log('<span class="bot">Please use text input instead.</span>', 'bot');
+      }
+  }
+
+  async function sendOfflineVoiceQuery(audioBlob) {
+      try {
+          const formData = new FormData();
+          formData.append('audio', audioBlob, 'voice.wav');
+          formData.append('language', currentLanguage);
+          
+          const response = await fetch('/voice/', {
+              method: 'POST',
+              body: formData
+          });
+          
+          const data = await response.json();
+          
+          if (data.success) {
+              if (data.user_text) {
+                  log(`<span class="you">You said:</span> ${data.user_text}`, 'you');
+              }
+              log(`<span class="bot">Bot:</span> ${data.text_response}`, 'bot');
+              displaySchemes(data.schemes);
+              
+              if (data.confidence < 0.5) {
+                  log('<em>Note: Low confidence response. Please try rephrasing.</em>', 'bot');
+              }
+          } else {
+              log(`<span class="bot">❌ Offline voice processing failed:</span> ${data.error}`, 'bot');
+              log('<span class="bot">💡 Please try text input instead.</span>', 'bot');
+          }
+      } catch (error) {
+          log(`<span class="bot">❌ Error processing offline voice:</span> ${error.message}`, 'bot');
+          log('<span class="bot">💡 Please use text input instead.</span>', 'bot');
+      }
+  }
+
+  function getLanguageCode(lang) {
+      const langMap = {
+          'en': 'en-US',
+          'hi': 'hi-IN',
+          'kn': 'kn-IN',
+          'ta': 'ta-IN',
+          'te': 'te-IN',
+          'bn': 'bn-IN',
+          'gu': 'gu-IN',
+          'mr': 'mr-IN',
+          'pa': 'pa-IN'
+      };
+      return langMap[lang] || 'en-US';
+  }
+
+  // sendVoiceQuery function removed - using Web Speech API with direct text processing
+
+  // Microphone test function
+  async function testMicrophone() {
+      log('🔍 Testing microphone...', 'bot');
+      
+      try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          log('✅ Microphone access granted and working!', 'bot');
+          log('🎤 You can now use voice input safely.', 'bot');
+          
+          // Stop the stream
+          stream.getTracks().forEach(track => track.stop());
+      } catch (error) {
+          log('❌ Microphone test failed:', 'bot');
+          if (error.name === 'NotAllowedError') {
+              log('• Microphone access was denied', 'bot');
+              log('• Please allow microphone access and try again', 'bot');
+          } else if (error.name === 'NotFoundError') {
+              log('• No microphone found', 'bot');
+              log('• Please connect a microphone and try again', 'bot');
+          } else {
+              log(`• Error: ${error.message}`, 'bot');
+          }
+          log('💡 Please use text input instead.', 'bot');
+      }
+  }
+
+  // Initialize modern interface
+  document.addEventListener('DOMContentLoaded', function() {
+      // Update connection status
+      updateConnectionStatus();
+      
+      // Show welcome message with modern styling
+      showWelcomeMessage();
+      
+      // Create modern text input interface
+      createTextInputInterface();
+      
+      // Create sample questions
+      createSampleQuestions();
+      
+      // Create utility buttons
+      createUtilityButtons();
+      
+      // Add UI language switcher
+      addUILanguageSwitcher();
+  });
+
+  function showWelcomeMessage() {
+      const t = uiTranslations[currentUILanguage];
+      log(`<div style="text-align: center; padding: 1rem;"><i class="fas fa-sparkles" style="color: #f59e0b; margin-right: 0.5rem;"></i><strong>${t.welcome}</strong></div>`, 'bot');
+      log(`<div style="text-align: center; margin: 0.5rem 0;"><i class="fas fa-info-circle" style="color: #3b82f6; margin-right: 0.5rem;"></i>${t.welcomeDesc}</div>`, 'bot');
+  }
+
+  function switchUILanguage(lang) {
+      currentUILanguage = lang;
+      updateUILanguage();
+  }
+
+  function updateUILanguage() {
+      const t = uiTranslations[currentUILanguage];
+      
+      // Update header
+      document.querySelector('.header h1').textContent = t.title;
+      document.querySelector('.header h2').textContent = t.subtitle;
+      document.querySelector('.header-subtitle').innerHTML = `<i class="fas fa-robot"></i> ${t.description}`;
+      
+      // Update chat header
+      document.querySelector('.chat-header h3').innerHTML = `<i class="fas fa-comments"></i> ${t.chatAssistant}`;
+      
+      // Update voice button
+      document.querySelector('.voice-btn span').textContent = t.clickSpeak;
+      
+      // Update connection status
+      updateConnectionStatus();
+      
+      // Recreate interface elements with new language
+      createTextInputInterface();
+      createSampleQuestions();
+      createUtilityButtons();
+      
+      // Clear and show new welcome message
+      document.getElementById('log').innerHTML = '';
+      showWelcomeMessage();
+  }
+
+  function updateConnectionStatus() {
+      const statusElement = document.getElementById('connection-status');
+      const t = uiTranslations[currentUILanguage];
+      if (navigator.onLine) {
+          statusElement.textContent = t.online;
+          statusElement.style.color = '#10b981';
+      } else {
+          statusElement.textContent = t.offline;
+          statusElement.style.color = '#f59e0b';
+      }
+  }
+
+  function createTextInputInterface() {
+      const t = uiTranslations[currentUILanguage];
+      const textInputArea = document.getElementById('text-input-area');
+      textInputArea.innerHTML = `
+          <div class="text-input-section">
+              <div class="input-group">
+                  <input type="text" id="textInput" class="text-input" 
+                         placeholder="${t.placeholder}" 
+                         autocomplete="off">
+                  <button onclick="handleTextInput()" class="send-btn">
+                      <i class="fas fa-paper-plane"></i>
+                      ${t.send}
+                  </button>
+              </div>
+              
+              <div class="language-section">
+                  <div class="language-label">
+                      <i class="fas fa-language"></i>
+                      ${t.language}:
+                  </div>
+                  <select id="languageSelect" class="language-select" onchange="changeLanguage()">
+                      <option value="en">🇺🇸 English</option>
+                      <option value="hi">🇮🇳 हिंदी (Hindi)</option>
+                      <option value="kn">🇮🇳 ಕನ್ನಡ (Kannada)</option>
+                      <option value="ta">🇮🇳 தமிழ் (Tamil)</option>
+                      <option value="te">🇮🇳 తెలుగు (Telugu)</option>
+                      <option value="bn">🇮🇳 বাংলা (Bengali)</option>
+                      <option value="gu">🇮🇳 ગુજરાતી (Gujarati)</option>
+                      <option value="mr">🇮🇳 मराठी (Marathi)</option>
+                      <option value="pa">🇮🇳 ਪੰਜਾਬੀ (Punjabi)</option>
+                  </select>
+              </div>
+          </div>
+      `;
+      
+      // Add enter key support
+      document.getElementById('textInput').addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+              handleTextInput();
+          }
+      });
+  }
+
+  function createSampleQuestions() {
+      const t = uiTranslations[currentUILanguage];
+      const textInputArea = document.getElementById('text-input-area');
+      
+      // Sample questions in current UI language
+      const sampleQueries = {
+          en: [
+              'What are agriculture schemes available?',
+              'Tell me about health schemes for women',
+              'How to apply for education scholarships?',
+              'What employment schemes are available?',
+              'Housing schemes for middle class families'
+          ],
+          kn: [
+              'ಯಾವ ಕೃಷಿ ಯೋಜನೆಗಳು ಲಭ್ಯವಿವೆ?',
+              'ಮಹಿಳೆಯರಿಗಾಗಿ ಆರೋಗ್ಯ ಯೋಜನೆಗಳ ಬಗ್ಗೆ ಹೇಳಿ',
+              'ಶಿಕ್ಷಣ ವಿದ್ಯಾರ್ಥಿವೇತನಕ್ಕೆ ಹೇಗೆ ಅರ್ಜಿ ಸಲ್ಲಿಸುವುದು?',
+              'ಯಾವ ಉದ್ಯೋಗ ಯೋಜನೆಗಳು ಲಭ್ಯವಿವೆ?',
+              'ಮಧ್ಯಮ ವರ್ಗೀಯ ಕುಟುಂಬಗಳಿಗೆ ವಸತಿ ಯೋಜನೆಗಳು'
+          ]
+      };
+      
+      const queries = sampleQueries[currentUILanguage] || sampleQueries.en;
+      
+      const sampleQuestionsHtml = `
+          <div class="sample-questions">
+              <h4>
+                  <i class="fas fa-lightbulb"></i>
+                  ${t.sampleQuestions}
+              </h4>
+              <div class="question-buttons">
+                  <button class="question-btn" onclick="sendTextQuery('${queries[0]}')">
+                      🌾 ${t.agriculture}
+                  </button>
+                  <button class="question-btn" onclick="sendTextQuery('${queries[1]}')">
+                      🏥 ${t.health}
+                  </button>
+                  <button class="question-btn" onclick="sendTextQuery('${queries[2]}')">
+                      🎓 ${t.education}
+                  </button>
+                  <button class="question-btn" onclick="sendTextQuery('${queries[3]}')">
+                      💼 ${t.employment}
+                  </button>
+                  <button class="question-btn" onclick="sendTextQuery('${queries[4]}')">
+                      🏠 ${t.housing}
+                  </button>
+              </div>
+          </div>
+      `;
+      textInputArea.insertAdjacentHTML('beforeend', sampleQuestionsHtml);
+  }
+
+  function createUtilityButtons() {
+      const t = uiTranslations[currentUILanguage];
+      const textInputArea = document.getElementById('text-input-area');
+      const utilityHtml = `
+          <div class="utility-section">
+              <button class="utility-btn" onclick="toggleAdvancedSearch()">
+                  <i class="fas fa-search-plus"></i>
+                  ${t.advancedSearch}
+              </button>
+              <button class="utility-btn" onclick="testMicrophone()">
+                  <i class="fas fa-microphone-alt"></i>
+                  ${t.testMic}
+              </button>
+              <button class="utility-btn" onclick="clearChat()">
+                  <i class="fas fa-broom"></i>
+                  ${t.clearChat}
+              </button>
+              <button class="utility-btn" onclick="showHelp()">
+                  <i class="fas fa-question-circle"></i>
+                  ${t.help}
+              </button>
+          </div>
+      `;
+      textInputArea.insertAdjacentHTML('beforeend', utilityHtml);
+  }
+
+  function addUILanguageSwitcher() {
+      const header = document.querySelector('.header-content');
+      const languageSwitcher = `
+          <div style="margin-top: 1rem;">
+              <button onclick="switchUILanguage('en')" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 0.5rem 1rem; margin: 0.25rem; border-radius: 0.5rem; cursor: pointer; font-weight: ${currentUILanguage === 'en' ? '600' : '400'};">
+                  🇺🇸 English
+              </button>
+              <button onclick="switchUILanguage('kn')" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 0.5rem 1rem; margin: 0.25rem; border-radius: 0.5rem; cursor: pointer; font-weight: ${currentUILanguage === 'kn' ? '600' : '400'};">
+                  🇮🇳 ಕನ್ನಡ
+              </button>
+          </div>
+      `;
+      header.insertAdjacentHTML('beforeend', languageSwitcher);
+  }
+
+  function clearChat() {
+      const t = uiTranslations[currentUILanguage];
+      document.getElementById('log').innerHTML = '';
+      log(`<div style="text-align: center; padding: 1rem; color: #10b981;"><i class="fas fa-check-circle"></i> ${t.chatCleared}</div>`, 'bot');
+  }
+
+  function showHelp() {
+      const t = uiTranslations[currentUILanguage];
+      log(`<div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 1.5rem; border-radius: 0.75rem; margin: 1rem 0;"><h4 style="color: #1e40af; margin-bottom: 1rem;"><i class="fas fa-info-circle"></i> ${t.helpTitle}</h4><ul style="text-align: left; color: #374151;"><li><strong>${t.helpVoice}</strong></li><li><strong>${t.helpText}</strong></li><li><strong>${t.helpSample}</strong></li><li><strong>${t.helpLanguages}</strong></li><li><strong>${t.helpTopics}</strong></li></ul></div>`, 'bot');
+  }
+
+  function handleTextInput() {
+      const input = document.getElementById('textInput');
+      const query = input.value.trim();
+      if (query) {
+          sendTextQuery(query);
+          input.value = '';
+      }
+  }
+
+  // Advanced Search Functions
+  let advancedSearchVisible = false;
+
+  function toggleAdvancedSearch() {
+      const container = document.getElementById('advanced-search-container');
+      const t = uiTranslations[currentUILanguage];
+      
+      advancedSearchVisible = !advancedSearchVisible;
+      
+      if (advancedSearchVisible) {
+          container.style.display = 'block';
+          updateAdvancedSearchLabels();
+          // Scroll to advanced search
+          container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+          container.style.display = 'none';
+      }
+  }
+
+  function updateAdvancedSearchLabels() {
+      const t = uiTranslations[currentUILanguage];
+      
+      // Update all labels in advanced search
+      document.getElementById('advanced-search-title').textContent = t.advancedSearch;
+      document.getElementById('close-search-text').textContent = 'Close';
+      document.getElementById('sector-filter-label').textContent = t.filters + ' - Sector';
+      document.getElementById('ministry-filter-label').textContent = t.filterByMinistry;
+      document.getElementById('eligibility-filter-label').textContent = t.filterByEligibility;
+      document.getElementById('sort-by-label').textContent = t.sortBy;
+      document.getElementById('search-btn-text').textContent = t.showResults;
+      document.getElementById('clear-filters-text').textContent = t.clearFilters;
+      
+      // Update sector options
+      updateSectorOptions();
+      updateSortOptions();
+  }
+
+  function updateSectorOptions() {
+      const t = uiTranslations[currentUILanguage];
+      const sectorSelect = document.getElementById('sectorFilter');
+      
+      sectorSelect.innerHTML = `
+          <option value="">${t.allSectors}</option>
+          <option value="agriculture">🌾 ${t.agriculture}</option>
+          <option value="health">🏥 ${t.health}</option>
+          <option value="education">🎓 ${t.education}</option>
+          <option value="employment">💼 ${t.employment}</option>
+          <option value="housing">🏠 ${t.housing}</option>
+          <option value="social_welfare">🤝 ${t.socialWelfare}</option>
+          <option value="rural_development">🏘️ ${t.ruralDevelopment}</option>
+          <option value="urban_development">🏙️ ${t.urbanDevelopment}</option>
+          <option value="women_empowerment">👩 ${t.womenEmpowerment}</option>
+          <option value="youth_development">👨‍🎓 ${t.youthDevelopment}</option>
+          <option value="senior_citizens">👴 ${t.seniorCitizens}</option>
+          <option value="disability">♿ ${t.disability}</option>
+      `;
+  }
+
+  function updateSortOptions() {
+      const t = uiTranslations[currentUILanguage];
+      const sortSelect = document.getElementById('sortBy');
+      
+      sortSelect.innerHTML = `
+          <option value="relevance">${t.sortRelevance}</option>
+          <option value="alphabetical">${t.sortAlphabetical}</option>
+          <option value="newest">${t.sortNewest}</option>
+          <option value="oldest">${t.sortOldest}</option>
+      `;
+  }
+
+  function clearAdvancedFilters() {
+      document.getElementById('sectorFilter').value = '';
+      document.getElementById('ministryFilter').value = '';
+      document.getElementById('eligibilityFilter').value = '';
+      document.getElementById('sortBy').value = 'relevance';
+      
+      const t = uiTranslations[currentUILanguage];
+      log(`<div style="text-align: center; padding: 1rem; color: #f59e0b;"><i class="fas fa-eraser"></i> ${t.clearFilters} - Ready for new search</div>`, 'bot');
+  }
+
+  async function performAdvancedSearch() {
+      const t = uiTranslations[currentUILanguage];
+      const sector = document.getElementById('sectorFilter').value;
+      const ministry = document.getElementById('ministryFilter').value.trim();
+      const eligibility = document.getElementById('eligibilityFilter').value.trim();
+      const sortBy = document.getElementById('sortBy').value;
+      
+      // Build search query
+      let searchQuery = 'Show me government schemes';
+      if (sector) {
+          const sectorName = document.getElementById('sectorFilter').selectedOptions[0].textContent.replace(/🌾|🏥|🎓|💼|🏠|🤝|🏘️|🏙️|👩|👨‍🎓|👴|♿/g, '').trim();
+          searchQuery += ` in ${sectorName}`;
+      }
+      if (ministry) {
+          searchQuery += ` from ${ministry} ministry`;
+      }
+      if (eligibility) {
+          searchQuery += ` for ${eligibility}`;
+      }
+      
+      log(`<span class="you">Advanced Search:</span> ${searchQuery}`, 'you');
+      log(t.processing, 'bot');
+      
+      try {
+          const response = await fetch('/api/chat/advanced-search/', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRFToken': getCookie('csrftoken')
+              },
+              body: JSON.stringify({
+                  sector: sector,
+                  ministry: ministry,
+                  eligibility: eligibility,
+                  sortBy: sortBy,
+                  language: currentLanguage
+              })
+          });
+          
+          if (response.ok) {
+              const data = await response.json();
+              
+              // Remove processing message
+              const logElement = document.getElementById('log');
+              if (logElement.lastElementChild && logElement.lastElementChild.textContent.includes(t.processing)) {
+                  logElement.removeChild(logElement.lastElementChild);
+              }
+              
+              if (data.schemes && data.schemes.length > 0) {
+                  // Show results header
+                  showSearchResultsHeader(data.schemes.length, sortBy);
+                  
+                  // Sort schemes based on selection
+                  const sortedSchemes = sortSchemes(data.schemes, sortBy);
+                  
+                  // Display schemes
+                  displaySchemes(sortedSchemes);
+                  
+                  log(`<span class="bot">Bot:</span> ${data.response}`, 'bot');
+              } else {
+                  showNoResults();
+              }
+          } else {
+              log(`<span class="bot">Error:</span> Failed to perform advanced search. Please try again.`, 'bot');
+          }
+      } catch (error) {
+          console.error('Advanced search error:', error);
+          log(`<span class="bot">Error:</span> Network error. Please check your connection.`, 'bot');
+      }
+  }
+
+  function showSearchResultsHeader(count, sortBy) {
+      const t = uiTranslations[currentUILanguage];
+      const sortText = getSortText(sortBy);
+      
+      const headerHtml = `
+          <div class="search-results-header">
+              <div class="results-count">
+                  <i class="fas fa-search"></i>
+                  <strong>${count}</strong> ${t.resultsFound}
+              </div>
+              <div class="sort-controls">
+                  <span class="sort-label">${t.sortBy}:</span>
+                  <span><strong>${sortText}</strong></span>
+              </div>
+          </div>
+      `;
+      
+      log(headerHtml, 'search-results');
+  }
+
+  function getSortText(sortBy) {
+      const t = uiTranslations[currentUILanguage];
+      const sortTexts = {
+          'relevance': t.sortRelevance,
+          'alphabetical': t.sortAlphabetical,
+          'newest': t.sortNewest,
+          'oldest': t.sortOldest
+      };
+      return sortTexts[sortBy] || t.sortRelevance;
+  }
+
+  function sortSchemes(schemes, sortBy) {
+      const sortedSchemes = [...schemes];
+      
+      switch (sortBy) {
+          case 'alphabetical':
+              return sortedSchemes.sort((a, b) => a.title.localeCompare(b.title));
+          case 'newest':
+              return sortedSchemes.sort((a, b) => new Date(b.created_date || 0) - new Date(a.created_date || 0));
+          case 'oldest':
+              return sortedSchemes.sort((a, b) => new Date(a.created_date || 0) - new Date(b.created_date || 0));
+          case 'relevance':
+          default:
+              return sortedSchemes; // Keep original relevance order
+      }
+  }
+
+  function showNoResults() {
+      const t = uiTranslations[currentUILanguage];
+      
+      const noResultsHtml = `
+          <div class="no-results">
+              <i class="fas fa-search-minus"></i>
+              <h3>${t.noResults}</h3>
+              <p>Try adjusting your search criteria or use different keywords.</p>
+              <div class="search-suggestions">
+                  <p><strong>Suggestions:</strong></p>
+                  <div class="suggestion-chips">
+                      <span class="suggestion-chip" onclick="document.getElementById('sectorFilter').value='agriculture'; performAdvancedSearch();">Agriculture</span>
+                      <span class="suggestion-chip" onclick="document.getElementById('sectorFilter').value='health'; performAdvancedSearch();">Health</span>
+                      <span class="suggestion-chip" onclick="document.getElementById('sectorFilter').value='education'; performAdvancedSearch();">Education</span>
+                      <span class="suggestion-chip" onclick="clearAdvancedFilters();">Clear All</span>
+                  </div>
+              </div>
+          </div>
+      `;
+      
+      log(noResultsHtml, 'no-results');
+  }
+
+  function changeLanguage() {
+      currentLanguage = document.getElementById('languageSelect').value;
+      log(`Language changed to: ${document.getElementById('languageSelect').selectedOptions[0].text}`, 'bot');
+  }
+
+  // CSRF token helper
+  function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+  }
+  </script>
+</body>
+</html>

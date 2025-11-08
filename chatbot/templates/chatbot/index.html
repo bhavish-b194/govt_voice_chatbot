@@ -1,0 +1,765 @@
+{% load static %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Government Voice Chatbot</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .chat-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .chat-header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .chat-header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+        }
+        
+        .language-selector {
+            margin: 15px 0;
+        }
+        
+        .language-selector select {
+            border: none;
+            border-radius: 25px;
+            padding: 8px 15px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-weight: 500;
+            font-family: 'Noto Sans Kannada', 'Segoe UI', sans-serif;
+        }
+
+        /* Add Noto Sans Kannada font for Kannada text */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;500;700&display=swap');
+        
+        .language-selector select option {
+            color: #333;
+        }
+        
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .message.user {
+            justify-content: flex-end;
+        }
+        
+        .message.bot {
+            justify-content: flex-start;
+        }
+        
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+        }
+        
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .message.bot .message-content {
+            background: white;
+            color: #333;
+            border: 1px solid #e9ecef;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .message-time {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+        
+        .scheme-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .scheme-card h6 {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .scheme-card .sector-badge {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .chat-input {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .input-group {
+            position: relative;
+        }
+        
+        .form-control {
+            border-radius: 25px;
+            border: 2px solid #e9ecef;
+            padding: 12px 50px 12px 20px;
+            font-size: 1rem;
+        }
+        
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .voice-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: none;
+            color: #667eea;
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 10;
+        }
+        
+        .voice-btn:hover {
+            color: #5a6fd8;
+        }
+        
+        .voice-btn.recording {
+            color: #dc3545;
+            animation: pulse 1s infinite;
+        }
+        
+        .stop-btn {
+            color: #dc3545 !important;
+            background: rgba(220, 53, 69, 0.1) !important;
+        }
+        
+        .stop-btn:hover {
+            color: #c82333 !important;
+            background: rgba(220, 53, 69, 0.2) !important;
+        }
+        
+        .stop-btn.recording {
+            color: #dc3545 !important;
+            background: rgba(220, 53, 69, 0.2) !important;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: translateY(-50%) scale(1); }
+            50% { transform: translateY(-50%) scale(1.1); }
+            100% { transform: translateY(-50%) scale(1); }
+        }
+        
+        .send-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .welcome-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+        
+        .welcome-message i {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-card i {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .feature-card h5 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .feature-card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="chat-container">
+            <div class="chat-header">
+                <h1><i class="fas fa-robot"></i> {{ welcome_message }}</h1>
+                <p>{{ help_text }}</p>
+                
+                <div class="language-selector">
+                    <select id="languageSelect" class="form-select">
+                        <option value="en" {% if current_language == 'en' %}selected{% endif %}>English</option>
+                        <option value="hi" {% if current_language == 'hi' %}selected{% endif %}>Hindi (हिन्दी)</option>
+                        <option value="kn" {% if current_language == 'kn' %}selected{% endif %}>Kannada (ಕನ್ನಡ)</option>
+                        <option value="ta" {% if current_language == 'ta' %}selected{% endif %}>Tamil (தமிழ்)</option>
+                        <option value="te" {% if current_language == 'te' %}selected{% endif %}>Telugu (తెలుగు)</option>
+                        <option value="bn">Bengali (বাংলা)</option>
+                        <option value="gu">Gujarati (ગુજરાતી)</option>
+                        <option value="mr">Marathi (मराठी)</option>
+                        <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="welcome-message">
+                    <i class="fas fa-microphone-alt"></i>
+                    <h4>Welcome to Government Voice Chatbot!</h4>
+                    <p>I can help you find information about government schemes. You can:</p>
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <i class="fas fa-search"></i>
+                            <h5>Search Schemes</h5>
+                            <p>Find schemes by sector or keywords</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-microphone"></i>
+                            <h5>Voice Input</h5>
+                            <p>Speak your questions naturally</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-volume-up"></i>
+                            <h5>Voice Output</h5>
+                            <p>Listen to responses in your language</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-globe"></i>
+                            <h5>Multi-language</h5>
+                            <p>Supports 9 Indian languages</p>
+                        </div>
+                    </div>
+                    <p class="mt-3">Try asking: "What are the agriculture schemes available?" or "Tell me about health benefits"</p>
+                </div>
+            </div>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Processing your request...</p>
+            </div>
+            
+            <div class="chat-input">
+                <div class="input-group">
+                    <input type="text" id="messageInput" class="form-control" placeholder="Type your message or click the microphone to speak..." autocomplete="off">
+                    <button type="button" id="voiceBtn" class="voice-btn" title="Click to speak">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <button type="button" id="stopBtn" class="voice-btn stop-btn" title="Stop voice" style="display: none;">
+                        <i class="fas fa-stop"></i>
+                    </button>
+                    <button type="button" id="sendBtn" class="btn send-btn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Cache busting
+        console.log('Chatbot script loaded at:', new Date().toISOString());
+        class GovernmentChatbot {
+            constructor() {
+                this.sessionId = this.generateSessionId();
+                this.isRecording = false;
+                this.mediaRecorder = null;
+                this.audioChunks = [];
+                this.currentAudio = null; // Track current playing audio
+                this.initializeElements();
+                this.attachEventListeners();
+            }
+            
+            async initializeElements() {
+                this.chatMessages = document.getElementById('chatMessages');
+                this.messageInput = document.getElementById('messageInput');
+                this.voiceBtn = document.getElementById('voiceBtn');
+                this.stopBtn = document.getElementById('stopBtn');
+                this.sendBtn = document.getElementById('sendBtn');
+                this.languageSelect = document.getElementById('languageSelect');
+                this.loading = document.getElementById('loading');
+                
+                // Check for browser support
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    this.addSystemMessage("Your browser doesn't support voice input. Please use a modern browser like Chrome.");
+                    this.voiceBtn.disabled = true;
+                    return;
+                }
+                
+                // Check microphone permission
+                try {
+                    await navigator.mediaDevices.getUserMedia({ audio: true });
+                    console.log("Microphone permission granted");
+                } catch (err) {
+                    console.error("Microphone permission error:", err);
+                    this.addSystemMessage("Please allow microphone access to use voice features.");
+                    this.voiceBtn.disabled = true;
+                }
+            }
+            
+            attachEventListeners() {
+                this.sendBtn.addEventListener('click', () => this.sendMessage());
+                this.messageInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.sendMessage();
+                    }
+                });
+                this.voiceBtn.addEventListener('click', () => this.toggleRecording());
+                this.stopBtn.addEventListener('click', () => this.stopVoice());
+                this.languageSelect.addEventListener('change', () => this.updateLanguage());
+            }
+            
+            generateSessionId() {
+                return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            }
+            
+            updateLanguage() {
+                const language = this.languageSelect.value;
+                console.log('Language changed to:', language);
+            }
+            
+            async sendMessage() {
+                const message = this.messageInput.value.trim();
+                if (!message) return;
+                
+                this.addMessage('user', message);
+                this.messageInput.value = '';
+                this.showLoading(true);
+                
+                try {
+                    const response = await this.sendTextMessage(message);
+                    this.handleResponse(response);
+                } catch (error) {
+                    this.handleError(error);
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+            
+            async sendTextMessage(message) {
+                const response = await fetch('/api/chat/text/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': this.getCSRFToken()
+                    },
+                    body: JSON.stringify({
+                        query: message,
+                        language: this.languageSelect.value,
+                        session_id: this.sessionId
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                return await response.json();
+            }
+            
+            async sendVoiceMessage(audioBlob) {
+                const formData = new FormData();
+                formData.append('audio', audioBlob, 'voice.wav');
+                formData.append('language', this.languageSelect.value);
+                formData.append('session_id', this.sessionId);
+                
+                const response = await fetch('/api/chat/voice/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': this.getCSRFToken()
+                    },
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                return await response.json();
+            }
+            
+            async toggleRecording() {
+                if (this.isRecording) {
+                    this.stopRecording();
+                } else {
+                    // Stop any current audio playback before starting recording
+                    this.stopVoice();
+                    await this.startRecording();
+                }
+            }
+            
+            stopVoice() {
+                // Stop current audio playback
+                if (this.currentAudio) {
+                    this.currentAudio.pause();
+                    this.currentAudio.currentTime = 0;
+                    this.currentAudio = null;
+                }
+                
+                // Stop recording if active
+                if (this.isRecording) {
+                    this.stopRecording();
+                }
+                
+                // Hide stop button and show voice button
+                this.stopBtn.style.display = 'none';
+                this.stopBtn.classList.remove('recording');
+                this.voiceBtn.style.display = 'block';
+            }
+            
+            async startRecording() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    this.mediaRecorder = new MediaRecorder(stream);
+                    this.audioChunks = [];
+                    
+                    this.mediaRecorder.ondataavailable = (event) => {
+                        this.audioChunks.push(event.data);
+                    };
+                    
+                    this.mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
+                        this.processVoiceMessage(audioBlob);
+                        stream.getTracks().forEach(track => track.stop());
+                    };
+                    
+                    this.mediaRecorder.start();
+                    this.isRecording = true;
+                    this.voiceBtn.style.display = 'none';
+                    this.stopBtn.style.display = 'block';
+                    this.stopBtn.classList.add('recording');
+                    
+                } catch (error) {
+                    console.error('Error starting recording:', error);
+                    this.showError('Microphone access denied. Please allow microphone access and try again.');
+                }
+            }
+            
+            stopRecording() {
+                if (this.mediaRecorder && this.isRecording) {
+                    this.mediaRecorder.stop();
+                    this.isRecording = false;
+                    this.stopBtn.classList.remove('recording');
+                    this.stopBtn.style.display = 'none';
+                    this.voiceBtn.style.display = 'block';
+                }
+            }
+            
+            async processVoiceMessage(audioBlob) {
+                this.showLoading(true);
+                
+                try {
+                    const response = await this.sendVoiceMessage(audioBlob);
+                    this.handleVoiceResponse(response);
+                } catch (error) {
+                    this.handleError(error);
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+            
+            handleResponse(response) {
+                console.log('Response received:', response); // Debug log
+                if (response.success) {
+                    console.log('Response text:', response.response.text); // Debug log
+                    this.addMessage('bot', response.response.text);
+                    
+                    if (response.schemes && response.schemes.length > 0) {
+                        console.log('Adding schemes:', response.schemes.length); // Debug log
+                        this.addSchemes(response.schemes);
+                    }
+                } else {
+                    console.error('Response error:', response.error); // Debug log
+                    this.showError(response.error || 'An error occurred while processing your request.');
+                }
+            }
+            
+            handleVoiceResponse(response) {
+                if (response.success) {
+                    this.addMessage('bot', response.text_response);
+                    
+                    if (response.audio_response && response.audio_response.success) {
+                        this.playAudioResponse(response.audio_response.audio_data, response.audio_response.format);
+                    }
+                    
+                    if (response.schemes && response.schemes.length > 0) {
+                        this.addSchemes(response.schemes);
+                    }
+                } else {
+                    this.showError(response.error || 'An error occurred while processing your voice message.');
+                }
+            }
+            
+            playAudioResponse(audioData, format) {
+                try {
+                    // Stop any current audio first
+                    this.stopVoice();
+                    
+                    const audioBlob = new Blob([Uint8Array.from(atob(audioData), c => c.charCodeAt(0))], { 
+                        type: format === 'mp3' ? 'audio/mpeg' : 'audio/wav' 
+                    });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    const audio = new Audio(audioUrl);
+                    
+                    // Track current audio
+                    this.currentAudio = audio;
+                    
+                    // Show stop button while playing
+                    this.voiceBtn.style.display = 'none';
+                    this.stopBtn.style.display = 'block';
+                    this.stopBtn.classList.add('recording'); // Add visual indicator
+                    
+                    audio.play();
+                    
+                    audio.onended = () => {
+                        URL.revokeObjectURL(audioUrl);
+                        this.currentAudio = null;
+                        // Hide stop button and show voice button when audio ends
+                        this.stopBtn.style.display = 'none';
+                        this.stopBtn.classList.remove('recording');
+                        this.voiceBtn.style.display = 'block';
+                    };
+                    
+                    audio.onerror = () => {
+                        console.error('Error playing audio');
+                        this.currentAudio = null;
+                        this.stopBtn.style.display = 'none';
+                        this.stopBtn.classList.remove('recording');
+                        this.voiceBtn.style.display = 'block';
+                    };
+                } catch (error) {
+                    console.error('Error playing audio:', error);
+                    this.currentAudio = null;
+                    this.stopBtn.style.display = 'none';
+                    this.stopBtn.classList.remove('recording');
+                    this.voiceBtn.style.display = 'block';
+                }
+            }
+            
+            addMessage(type, content) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${type}`;
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content';
+                contentDiv.textContent = content;
+                
+                const timeDiv = document.createElement('div');
+                timeDiv.className = 'message-time';
+                timeDiv.textContent = new Date().toLocaleTimeString();
+                
+                contentDiv.appendChild(timeDiv);
+                messageDiv.appendChild(contentDiv);
+                
+                this.chatMessages.appendChild(messageDiv);
+                this.scrollToBottom();
+            }
+            
+            addSchemes(schemes) {
+                const schemesDiv = document.createElement('div');
+                schemesDiv.className = 'message bot';
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content';
+                
+                schemes.forEach(scheme => {
+                    const schemeCard = document.createElement('div');
+                    schemeCard.className = 'scheme-card';
+                    
+                    schemeCard.innerHTML = `
+                        <h6>${scheme.title}</h6>
+                        <p>${scheme.short_description}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="sector-badge">${scheme.sector}</span>
+                            <small class="text-muted">${scheme.ministry}</small>
+                        </div>
+                        ${scheme.application_link ? `<a href="${scheme.application_link}" target="_blank" class="btn btn-sm btn-outline-primary mt-2">Apply Now</a>` : ''}
+                    `;
+                    
+                    contentDiv.appendChild(schemeCard);
+                });
+                
+                schemesDiv.appendChild(contentDiv);
+                this.chatMessages.appendChild(schemesDiv);
+                this.scrollToBottom();
+            }
+            
+            showError(message) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.textContent = message;
+                this.chatMessages.appendChild(errorDiv);
+                this.scrollToBottom();
+            }
+            
+            showLoading(show) {
+                this.loading.style.display = show ? 'block' : 'none';
+                this.sendBtn.disabled = show;
+                this.voiceBtn.disabled = show;
+                this.stopBtn.disabled = show;
+            }
+            
+            scrollToBottom() {
+                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+            }
+            
+            getCSRFToken() {
+                const cookies = document.cookie.split(';');
+                for (let cookie of cookies) {
+                    const [name, value] = cookie.trim().split('=');
+                    if (name === 'csrftoken') {
+                        return value;
+                    }
+                }
+                return '';
+            }
+            
+            handleError(error) {
+                console.error('Error:', error);
+                this.showError('Sorry, something went wrong. Please try again.');
+            }
+        }
+        
+        // Initialize chatbot when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new GovernmentChatbot();
+        });
+    </script>
+    
+    <!-- Load translations and voice handlers -->
+    <script>
+        // Pass translations to JavaScript
+        window.translations = JSON.parse('{{ translations|escapejs }}');
+        window.currentLanguage = "{{ current_language }}";
+    </script>
+    <script src="{% static 'js/translation_handler.js' %}"></script>
+    <script src="{% static 'js/voice_handler.js' %}"></script>
+    <script src="{% static 'js/voice_utils.js' %}"></script>
+</body>
+</html>
